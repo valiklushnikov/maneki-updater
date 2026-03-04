@@ -124,7 +124,7 @@ class ReleaseManager:
 release_manager = ReleaseManager(RELEASES_DIR)
 
 
-@app.route('maneki/api/updates/latest', methods=['GET'])
+@app.route('/maneki/api/updates/latest', methods=['GET'])
 def get_latest():
     """Получить последнюю версию Terminal"""
     try:
@@ -148,7 +148,7 @@ def get_latest():
         }), 500
 
 
-@app.route('maneki/api/updates/check', methods=['GET'])
+@app.route('/maneki/api/updates/check', methods=['GET'])
 def check_updates():
     """Проверить наличие обновлений Terminal"""
     try:
@@ -199,7 +199,7 @@ def check_updates():
         }), 500
 
 
-@app.route('maneki/api/updates/download/<version>', methods=['GET'])
+@app.route('/maneki/api/updates/download/<version>', methods=['GET'])
 def download_update(version: str):
     """Скачать Terminal.exe определенной версии"""
     try:
@@ -224,7 +224,7 @@ def download_update(version: str):
         }), 500
 
 
-@app.route('maneki/api/updates/changelog/<version>', methods=['GET'])
+@app.route('/maneki/api/updates/changelog/<version>', methods=['GET'])
 def get_changelog(version: str):
     """Получить changelog конкретной версии"""
     try:
@@ -253,7 +253,7 @@ def get_changelog(version: str):
         }), 500
 
 
-@app.route('maneki/api/updates/versions', methods=['GET'])
+@app.route('/maneki/api/updates/versions', methods=['GET'])
 def get_versions():
     """Получить список всех доступных версий Terminal в канале"""
     try:
@@ -275,7 +275,7 @@ def get_versions():
         }), 500
 
 
-@app.route('maneki/api/channels', methods=['GET'])
+@app.route('/maneki/api/channels', methods=['GET'])
 def get_channels():
     """Получить информацию о всех каналах"""
     try:
@@ -296,7 +296,7 @@ def get_channels():
         }), 500
 
 
-@app.route('maneki/health', methods=['GET'])
+@app.route('/maneki/health', methods=['GET'])
 def health_check():
     """Health check endpoint"""
     channels_info = release_manager.get_channels_info()
