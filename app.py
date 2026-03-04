@@ -27,12 +27,59 @@ class ReleaseManager:
         for channel in self.CHANNELS:
             channel_dir = self.releases_dir / channel
             channel_dir.mkdir(exist_ok=True)
+            (self.releases_dir / channel / "setup").mkdir(exist_ok=True)
 
     def _validate_channel(self, channel: str) -> str:
         """Валидация канала"""
         if not channel or channel not in self.CHANNELS:
             return self.DEFAULT_CHANNEL
         return channel
+
+    def get_latest_setup(self, channel: str = None) -> Path:
+        """Получить последний Setup файл для канала"""
+        channel = self._validate_channel(channel)
+        setup_dir = self.releases_dir / channel / "setup"
+
+        if not setup_dir.exists():
+            return None
+
+        setup_files = sorted(
+            setup_dir.glob("ManekiTerminal-Setup-*.exe"),
+            key=lambda f: self._parse_version(
+                f.stem.replace("ManekiTerminal-Setup-", "")
+            ),
+            reverse=True
+        )
+
+        return setup_files[0] if setup_files else None
+
+    def get_setup_by_version(self, version: str, channel: str = None) -> Path:
+        """Получить Setup файл конкретной версии для канала"""
+        channel = self._validate_channel(channel)
+        setup_file = self.releases_dir / channel / "setup" / f"ManekiTerminal-Setup-{version}.exe"
+        return setup_file if setup_file.exists() else None
+
+    def list_setups(self, channel: str = None) -> list:
+        """Получить список всех доступных Setup файлов в канале"""
+        channel = self._validate_channel(channel)
+        setup_dir = self.releases_dir / channel / "setup"
+
+        if not setup_dir.exists():
+            return []
+
+        setups = []
+        for f in setup_dir.glob("ManekiTerminal-Setup-*.exe"):
+            version = f.stem.replace("ManekiTerminal-Setup-", "")
+            setups.append({
+                "version": version,
+                "filename": f.name,
+                "size": f.stat().st_size,
+                "channel": channel,
+                "download_url": f"/maneki/api/setup/download/{version}?channel={channel}"
+            })
+
+        setups.sort(key=lambda x: self._parse_version(x["version"]), reverse=True)
+        return setups
 
     def get_latest_release(self, channel: str = None) -> dict:
         """Получить последний релиз Terminal для канала"""
@@ -122,6 +169,99 @@ class ReleaseManager:
 
 
 release_manager = ReleaseManager(RELEASES_DIR)
+
+# ==================== SETUP ENDPOINTS ====================
+
+@app.route('/maneki/api/setup/latest', methods=['GET'])
+def get_latest_setup():
+    """Получить информацию о последнем Setup"""
+    try:
+        channel = request.args.get('channel', 'production')
+        setup_file = release_manager.get_latest_setup(channel)
+
+        if not setup_file:
+            return jsonify({
+                "success": False,
+                "error": f"No setup files available in {channel} channel"
+            }), 404
+
+        version = setup_file.stem.replace("ManekiTerminal-Setup-", "")
+
+        return jsonify({
+            "success": True,
+            "data": {
+                "version": version,
+                "filename": setup_file.name,
+                "size": setup_file.stat().st_size,
+                "channel": channel,
+                "download_url": f"/maneki/api/setup/download/latest?channel={channel}"
+            }
+        })
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+@app.route('/maneki/api/setup/download/latest', methods=['GET'])
+def download_latest_setup():
+    """Скачать последний Setup"""
+    try:
+        channel = request.args.get('channel', 'production')
+        setup_file = release_manager.get_latest_setup(channel)
+
+        if not setup_file:
+            return jsonify({
+                "success": False,
+                "error": f"No setup files available in {channel} channel"
+            }), 404
+
+        return send_file(
+            setup_file,
+            as_attachment=True,
+            download_name=setup_file.name
+        )
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+@app.route('/maneki/api/setup/download/<version>', methods=['GET'])
+def download_setup_by_version(version: str):
+    """Скачать Setup конкретной версии"""
+    try:
+        channel = request.args.get('channel', 'production')
+        setup_file = release_manager.get_setup_by_version(version, channel)
+
+        if not setup_file:
+            return jsonify({
+                "success": False,
+                "error": f"Setup v{version} not found in {channel} channel"
+            }), 404
+
+        return send_file(
+            setup_file,
+            as_attachment=True,
+            download_name=setup_file.name
+        )
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+@app.route('/maneki/api/setup/versions', methods=['GET'])
+def get_setup_versions():
+    """Получить список всех доступных Setup файлов в канале"""
+    try:
+        channel = request.args.get('channel', 'production')
+        setups = release_manager.list_setups(channel)
+
+        return jsonify({
+            "success": True,
+            "data": {
+                "channel": channel,
+                "setups": setups,
+                "count": len(setups)
+            }
+        })
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
 
 
 @app.route('/maneki/api/updates/latest', methods=['GET'])
