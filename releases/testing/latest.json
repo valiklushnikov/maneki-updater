@@ -1,11 +1,11 @@
 {
   "version": "0.0.1",
   "channel": "testing",
-  "build": 1772646879,
-  "release_date": "2026-03-04T19:54:39.990486",
+  "build": 1772696811,
+  "release_date": "2026-03-05T09:46:51.422579",
   "download_url": "https://update.terminalx.trade/maneki/api/updates/download/0.0.1?channel=testing",
   "size": 37965824,
-  "sha256": "125217dcbcb0b0a6d6070f83accc73931cda1a5126f81d207b447a27211153f0",
+  "sha256": "5c0cff7c40bfb71e79db9e6b8e14f70c6b1c32ccfc54e8ce7c793505d9bf20e1",
   "changelog": [
     "Тестовая сборка TestNet"
   ],
