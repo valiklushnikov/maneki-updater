@@ -414,6 +414,26 @@ def get_versions():
             "error": str(e)
         }), 500
 
+@app.route('/maneki/api/updates/version', methods=['GET'])
+def get_latest_version():
+    """Получить только номер последней версии Terminal"""
+    try:
+        channel = request.args.get('channel', 'production')
+        release = release_manager.get_latest_release(channel)
+
+        if not release:
+            return jsonify({
+                "success": False,
+                "error": f"No releases available in {channel} channel"
+            }), 404
+
+        return jsonify({
+            "success": True,
+            "version": release['version']
+        })
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
 
 @app.route('/maneki/api/channels', methods=['GET'])
 def get_channels():
