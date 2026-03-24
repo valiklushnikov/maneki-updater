@@ -1,0 +1,14 @@
+{
+  "version": "0.0.17",
+  "channel": "testing",
+  "build": 1774354885,
+  "release_date": "2026-03-24T14:21:25.672108",
+  "download_url": "https://update.terminalx.trade/maneki/api/updates/download/0.0.17?channel=testing",
+  "size": 39209472,
+  "sha256": "ef3899f6817842c8bbf2f9b80ca276d821919a8c211f419f9322bca7bafb44be",
+  "changelog": [
+    "Тестовая сборка 0.0.17 MainNet"
+  ],
+  "required": false,
+  "min_version": "0.0.1"
+}
