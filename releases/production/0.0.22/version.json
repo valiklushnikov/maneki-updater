@@ -1,0 +1,14 @@
+{
+  "version": "0.0.22",
+  "channel": "production",
+  "build": 1775472028,
+  "release_date": "2026-04-06T13:40:28.503725",
+  "download_url": "https://update.terminalx.trade/maneki/api/updates/download/0.0.22?channel=production",
+  "size": 39457280,
+  "sha256": "ba7adb3c5e59d0b5d1629bb2503288f8426aa5237cb596c8ae0aceb3141e280b",
+  "changelog": [
+    "Сборка 0.0.22 MainNet"
+  ],
+  "required": false,
+  "min_version": "0.0.1"
+}
